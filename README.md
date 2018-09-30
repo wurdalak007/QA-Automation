@@ -10,4 +10,5 @@
 7. java com.company.Main
 ```
 
+
 ### Версия JDK 1.8
