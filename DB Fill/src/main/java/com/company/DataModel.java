@@ -101,9 +101,35 @@ public class DataModel {
         }
 
         this.INN = String.valueOf(77);
-        for (int i = 0; i < 10; i++) {
-            this.INN += String.valueOf(random.nextInt(9));
+        int n1[] = {3, 7, 2, 4, 10, 3, 5, 9, 4, 6, 8};
+        int n2[] = {7, 2, 4, 10, 3, 5, 9, 4, 6, 8};
+        int resultForN1 = 7*3 + 7*7;
+        int resultForN2 = 7*7 + 7*2;
+        for (int i = 0; i < 8; i++) {
+            int value = random.nextInt(9);
+            this.INN += String.valueOf(value);
+            resultForN1 += value*n1[i+2];
+            resultForN2 += value*n2[i+2];
         }
+
+        if (resultForN2 % 11 == 10) {
+            resultForN2 = 0;
+        } else {
+            resultForN2 = resultForN2 % 11;
+        }
+
+        this.INN += String.valueOf(resultForN2);
+
+        resultForN1 += resultForN2 * n1[10];
+
+        if (resultForN1 % 11 == 10) {
+            resultForN1 = 0;
+        } else {
+            resultForN1 = resultForN1 % 11;
+        }
+
+        this.INN += String.valueOf(resultForN1);
+
     }
 
     public String getCity() {
