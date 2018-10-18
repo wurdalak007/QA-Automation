@@ -3,6 +3,7 @@ package com.company;
 import java.io.*;
 import java.util.*;
 
+import com.mashape.unirest.http.exceptions.UnirestException;
 import org.apache.poi.hssf.extractor.ExcelExtractor;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -10,7 +11,7 @@ import org.apache.poi.ss.usermodel.*;
 
 public class Main {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, UnirestException {
 	// write your code here
         // создание самого excel файла в памяти
         HSSFWorkbook workbook = new HSSFWorkbook();
@@ -54,7 +55,7 @@ public class Main {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("Excel файл успешно создан! Путь :" + path);
+        System.out.println("Excel файл успешно создан! Путь :" + path + "/" + fileName);
     }
 
     // заполнение строки (rowNum) определенного листа (sheet)
@@ -86,7 +87,7 @@ public class Main {
 
     }
 
-    private static List<DataModel> fillData() throws IOException {
+    private static List<DataModel> fillData() throws IOException, UnirestException {
         List<DataModel> dataModels = new ArrayList<>();
         Random random = new Random();
         int size = random.nextInt(30);
