@@ -1,6 +1,12 @@
 package com.company;
 
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import javafx.scene.chart.PieChart;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -32,73 +38,42 @@ public class DataModel {
 
     public DataModel () throws IOException {
         // generation
+        try {
+            getDataFromAPI();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
 
+        generateAddress();
+        generateBirthDate();
+        generateINN();
+
+    }
+
+    public void getDataFromAPI() throws UnirestException {
+        Consts value = new Consts();
+        HttpResponse<JsonNode> jsonResponse =
+                Unirest.get(value.API).asJson();
+        JSONObject body = jsonResponse.getBody().getObject();
+        String date = body.getString("date");
+        this.name = body.getString("fname");
+        this.surname = body.getString("lname");
+        this.secondName = body.getString("patronymic");
+        this.city = body.getString("city");
+        this.postIndex = body.getString("postcode");
+        this.street = body.getString("street");
+        this.houseNum = body.getInt("house");
+        this.flatNum = body.getInt("apartment");
+
+        String gender = body.getString("gender");
+        if (gender.equals("m"))
+            this.sex = true;
+        else
+            this.sex = false;
+    }
+
+    public void generateINN() {
         Random random = new Random();
-        this.sex = random.nextBoolean();
-        String path = new File("").getAbsolutePath() + "/" + "src/main/resources/";
-
-        if (this.sex) {
-            try {
-                List<String> names = readAllLines(Paths.get(path+"MaleNames.txt"), StandardCharsets.UTF_8);
-                List<String> surnames = readAllLines(Paths.get(path+"surnames.txt"), StandardCharsets.UTF_8);
-                List<String> secondNames = readAllLines(Paths.get(path+"secondNameMale.txt"), StandardCharsets.UTF_8);
-                this.name = names.get(random.nextInt(names.size()) % names.size());
-                this.surname = surnames.get(random.nextInt(surnames.size()) % surnames.size());
-                this.secondName = secondNames.get(random.nextInt(secondNames.size()) % secondNames.size());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            try {
-                List<String> names = readAllLines(Paths.get(path+"femaleNames.txt"), StandardCharsets.UTF_8);
-                List<String> surnames = readAllLines(Paths.get(path+"surnames.txt"), StandardCharsets.UTF_8);
-                List<String> secondNames = readAllLines(Paths.get(path+"secondNameFemale.txt"), StandardCharsets.UTF_8);
-                this.name = names.get(random.nextInt(names.size()) % names.size());
-                this.surname = surnames.get(random.nextInt(surnames.size()) % surnames.size()) + "a";
-                this.secondName = secondNames.get(random.nextInt(secondNames.size()) % secondNames.size());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        this.age = 10 + random.nextInt(50);
-        this.houseNum = 10 + random.nextInt(100);
-        this.flatNum = 1 + random.nextInt(100);
-        List<String> cities = readAllLines(Paths.get(path+"city.txt"), StandardCharsets.UTF_8);
-        this.city = cities.get(random.nextInt(cities.size()) % cities.size());
-        List<String> streets = readAllLines(Paths.get(path+"street.txt"), StandardCharsets.UTF_8);
-        this.street = streets.get(random.nextInt(streets.size()) % streets.size());
-        List<String> regions = readAllLines(Paths.get(path+"region.txt"), StandardCharsets.UTF_8);
-        this.region = regions.get(random.nextInt(regions.size()) % regions.size());
-        List<String> countries = readAllLines(Paths.get(path+"country.txt"), StandardCharsets.UTF_8);
-        this.country = countries.get(random.nextInt(countries.size()) % countries.size());
-
-        this.postIndex = String.valueOf(random.nextInt(9));
-        for (int i = 0; i < 5; i++) {
-            this.postIndex += String.valueOf(random.nextInt(9));
-        }
-
-        int day = random.nextInt(28);
-        int month = random.nextInt(12);
-        int _year = 1900 + random.nextInt(99);
-        String year = String.valueOf(_year);
-        if (day < 10) {
-            this.dateOfBirth = "0" + String.valueOf(day) + "-";
-        } else {
-            this.dateOfBirth = String.valueOf(day) + "-";
-        }
-        if (month < 10) {
-            this.dateOfBirth += "0" + String.valueOf(month) + "-";
-        } else {
-            this.dateOfBirth += String.valueOf(month) + "-";
-        }
-
-        this.dateOfBirth += year;
-        if (month < 10) {
-            this.age = 2018 - _year;
-        } else {
-            this.age = 2018 - _year - 1;
-        }
 
         this.INN = String.valueOf(77);
         int n1[] = {3, 7, 2, 4, 10, 3, 5, 9, 4, 6, 8};
@@ -129,7 +104,43 @@ public class DataModel {
         }
 
         this.INN += String.valueOf(resultForN1);
+    }
 
+    public void generateBirthDate() {
+        Random random = new Random();
+        int day = random.nextInt(28);
+        int month = random.nextInt(12);
+        int _year = 1900 + random.nextInt(99);
+        String year = String.valueOf(_year);
+        if (day < 10) {
+            this.dateOfBirth = "0" + String.valueOf(day) + "-";
+        } else {
+            this.dateOfBirth = String.valueOf(day) + "-";
+        }
+        if (month < 10) {
+            this.dateOfBirth += "0" + String.valueOf(month) + "-";
+        } else {
+            this.dateOfBirth += String.valueOf(month) + "-";
+        }
+
+        this.dateOfBirth += year;
+        if (month < 10) {
+            this.age = 2018 - _year;
+        } else {
+            this.age = 2018 - _year - 1;
+        }
+
+    }
+
+
+    private void generateAddress() throws IOException {
+        Random random = new Random();
+        String path = new File("").getAbsolutePath() + "/" + "src/main/resources/";
+
+        List<String> regions = readAllLines(Paths.get(path+"region.txt"), StandardCharsets.UTF_8);
+        this.region = regions.get(random.nextInt(regions.size()) % regions.size());
+        List<String> countries = readAllLines(Paths.get(path+"country.txt"), StandardCharsets.UTF_8);
+        this.country = countries.get(random.nextInt(countries.size()) % countries.size());
     }
 
     public String getCity() {
