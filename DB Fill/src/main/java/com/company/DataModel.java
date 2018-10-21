@@ -4,17 +4,13 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import javafx.scene.chart.PieChart;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.*;
 import java.util.List;
 import java.util.Random;
 
@@ -36,19 +32,17 @@ public class DataModel {
     int houseNum;
     int flatNum;
 
-    public DataModel () throws IOException {
-        // generation
-        try {
-            getDataFromAPI();
-        } catch (UnirestException e) {
-            e.printStackTrace();
-        }
+    public DataModel() {}
 
-        generateAddress();
-        generateBirthDate();
-        generateINN();
+    public DataModel (boolean flag) throws IOException, UnirestException, SQLException {
+        // generation
+            getDataFromAPI();
+            generateAddress();
+            generateBirthDate();
+            generateINN();
 
     }
+
 
     public void getDataFromAPI() throws UnirestException {
         Consts value = new Consts();

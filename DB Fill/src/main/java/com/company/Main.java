@@ -1,6 +1,9 @@
 package com.company;
 
 import java.io.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.*;
 
 import com.mashape.unirest.http.exceptions.UnirestException;
@@ -11,7 +14,7 @@ import org.apache.poi.ss.usermodel.*;
 
 public class Main {
 
-    public static void main(String[] args) throws IOException, UnirestException {
+    public static void main(String[] args) throws IOException, SQLException {
 	// write your code here
         // создание самого excel файла в памяти
         HSSFWorkbook workbook = new HSSFWorkbook();
@@ -60,7 +63,7 @@ public class Main {
 
     // заполнение строки (rowNum) определенного листа (sheet)
     // данными  из dataModel созданного в памяти Excel файла
-    private static void createSheetHeader(HSSFSheet sheet, int rowNum, DataModel dataModel) {
+    private static void createSheetHeader(HSSFSheet sheet, int rowNum, DataModel dataModel) throws SQLException {
         Row row = sheet.createRow(rowNum);
 
         row.createCell(0).setCellValue(dataModel.getName());
@@ -84,16 +87,31 @@ public class Main {
         row.createCell(12).setCellValue(dataModel.getHouseNum());
         row.createCell(13).setCellValue(dataModel.getFlatNum());
 
+        addDataToDB(dataModel);
 
     }
 
-    private static List<DataModel> fillData() throws IOException, UnirestException {
+    private static void addDataToDB(DataModel dataModel) throws SQLException {
+        DataBase db = new DataBase();
+        db.Insert(dataModel);
+    }
+
+    private static List<DataModel> fillData() throws IOException, SQLException {
         List<DataModel> dataModels = new ArrayList<>();
         Random random = new Random();
         int size = random.nextInt(30);
-        for (int i = 0; i < size; i++) {
-            dataModels.add(new DataModel());
+        try {
+            for (int i = 0; i < size; i++) {
+                dataModels.add(new DataModel(true));
+            }
+        } catch (UnirestException e) {
+            DataBase db = new DataBase();
+            System.out.println("Internet connection lost. I'm trying to get data from data base");
+
+            for (int i = 0; i < size; i++)
+                dataModels.add(db.generate());
         }
+
         return dataModels;
     }
 
